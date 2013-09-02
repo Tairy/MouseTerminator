@@ -51,6 +51,7 @@ void Camera::sltTimeOut()
 
    if( m_camera )
    {
+       int i =0;
        while(1)
        {
            m_imgFrame = cvQueryFrame(m_camera);
@@ -73,7 +74,15 @@ void Camera::sltTimeOut()
                    ENCARAFaceDetector->ApplyENCARA2(m_imgFrame,2);
 
                    //ENCARA2 detection output
-                   ENCARAFaceDetector->PaintFacialData(m_imgFrame,CV_RGB(0,255,255));
+                   ENCARAFaceDetector->PaintFacialData(m_imgFrame,CV_RGB(0,255,0));
+           }
+           FacialData = ENCARAFaceDetector->GetFacialData();
+           faces = FacialData -> Faces;
+           if(FacialData ->NumFaces >0){
+               cerr<<"----------times---------"<<++i<<endl;
+               cerr<<"lefteye:("<<faces[0]->e_lx<<","<<faces[0]->e_ly<<")"<<endl;
+               cerr<<"righteye:("<<faces[0]->e_rx<<","<<faces[0]->e_ry<<")"<<endl;
+               cerr<<"nose:("<<faces[0]->np_x<<","<<faces[0]->np_y<<")"<<endl;
            }
 
            //将抓取到的帧转换成QImage格式

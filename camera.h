@@ -12,9 +12,11 @@
 #define ENCARA2INLINUX 1
 // Encara2's includes: begin
 #include "ENCARA2_2lib.h"
+#include <FacialData.h>
 // Encara2's includes: end
 
 #include <iostream>
+#include <fstream>
 #include <cstdio>
 
 #ifdef _EiC
@@ -50,7 +52,9 @@ private:
     CvCapture *m_camera;        //视频获取结构 作为视频获取函数的返回值
     IplImage *m_imgFrame;
     CENCARA2_2Detector *ENCARAFaceDetector; //Detector
-    CFacialDataperImage FacialData; //Detection data
+    //CFacialData *FacialData;
+    CFacialDataperImage *FacialData; //Detection data
+    CFacialData **faces;
 };
 
 #endif // CAMERA_H
