@@ -1,6 +1,9 @@
 #include "camera.h"
 #include "ui_camera.h"
 
+#include <qfile.h>
+#include <qtextstream.h>
+
 char ENCARAdataDir[256]="/home/tairy/Documents/v2.11/linux/ENCARA2data";
 
 Camera::Camera(QWidget *parent) :
@@ -30,7 +33,7 @@ Camera::~Camera()
     delete ENCARAFaceDetector;
     delete ui;
 }
-
+//display map and vedio
 void Camera::on_actionChangeDisplayOrder_triggered()
 {
     ui->stackedWidget->setCurrentIndex(1);
@@ -47,8 +50,6 @@ void Camera::on_actionDisplayVideo_triggered()
 void Camera::sltTimeOut()
 {
    Mat frame, frameCopy;
-
-
    if( m_camera )
    {
        int i =0;
@@ -73,20 +74,34 @@ void Camera::sltTimeOut()
                     //ENCARA2 processing
                    ENCARAFaceDetector->ApplyENCARA2(m_imgFrame,2);
 
-                   //ENCARA2 detection output
+                   //drow the position of eye
                    ENCARAFaceDetector->PaintFacialData(m_imgFrame,CV_RGB(0,255,0));
            }
            FacialData = ENCARAFaceDetector->GetFacialData();
            faces = FacialData -> Faces;
            if(FacialData ->NumFaces >0){
-               cerr<<"----------times---------"<<++i<<endl;
-               cerr<<"lefteye:("<<faces[0]->e_lx<<","<<faces[0]->e_ly<<")"<<endl;
-               cerr<<"righteye:("<<faces[0]->e_rx<<","<<faces[0]->e_ry<<")"<<endl;
-               cerr<<"nose:("<<faces[0]->np_x<<","<<faces[0]->np_y<<")"<<endl;
+               QFile f("/home/tairy/Documents/result/9.txt");
+               if(!f.open(QIODevice::WriteOnly | QIODevice::Text|QIODevice::Append))
+               {
+                   cerr << "Open failed." << endl;
+               }
+               QTextStream txtOutput(&f);
+
+               txtOutput<<i<<","<<1<<","<<faces[0]->e_lx<<","<<faces[0]->e_ly<<endl;
+               txtOutput<<i<<","<<2<<","<<faces[0]->e_rx<<","<<faces[0]->e_ry<<endl;
+               txtOutput<<i<<","<<3<<","<<faces[0]->np_x<<","<<faces[0]->np_y<<endl;
+               txtOutput<<i<<","<<4<<","<<faces[0]->ml_x<<","<<faces[0]->ml_y<<endl;
+               i++;
+               f.close();
            }
 
            //将抓取到的帧转换成QImage格式
            QImage showImage((const uchar*)m_imgFrame->imageData, m_imgFrame->width, m_imgFrame->height, QImage::Format_RGB888);
+
+//           QImage showImage = m_imgFrame.scaled(ui->stackedWidget->size(),
+//                                           Qt::KeepAspectRatio,
+//                                           Qt::SmoothTransformation);
+
            //将图片显示到QLabel上
            ui->m_lbPhoto->resize(ui->stackedWidget->size());
            ui-> m_lbPhoto-> setPixmap(QPixmap::fromImage(showImage));
