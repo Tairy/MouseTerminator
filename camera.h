@@ -8,6 +8,7 @@
 
 #include "cv.h"
 #include "highgui.h"
+#include "map.h"
 
 #define ENCARA2INLINUX 1
 // Encara2's includes: begin
@@ -39,11 +40,11 @@ public:
     ~Camera();
 
 private slots:
-    void on_actionChangeDisplayOrder_triggered();
     void sltTimeOut();
-    void on_actionDisplayVideo_triggered();
 
     void on_action_triggered();
+
+    float getVariance(float num);
 
 private:
     Ui::Camera *ui;
@@ -55,6 +56,8 @@ private:
     //CFacialData *FacialData;
     CFacialDataperImage *FacialData; //Detection data
     CFacialData **faces;
+
+    Map map;
 };
 
 #endif // CAMERA_H

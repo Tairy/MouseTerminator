@@ -18,11 +18,14 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        camera.cpp
+        camera.cpp \
+        map.cpp
 
-HEADERS  += camera.h
+HEADERS  += camera.h \
+    map.h
 
-FORMS    += camera.ui
+FORMS    += camera.ui \
+    map.ui
 
 INCLUDEPATH += /usr/local/include \
                 /usr/local/include/opencv \

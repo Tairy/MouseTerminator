@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "ui_camera.h"
+#include "map.h"
 
 #include <qfile.h>
 #include <qtextstream.h>
@@ -21,10 +22,11 @@ Camera::Camera(QWidget *parent) :
     ENCARAFaceDetector = NULL;
     m_timer->start(13);
 
-    ui->actionChangeDisplayOrder->setEnabled(false);
+    ui->actionChangeDisplayOrder->setEnabled(true);
     ui->actionDisplayVideo->setEnabled(true);
 
     connect(m_timer, SIGNAL(timeout()), this, SLOT(sltTimeOut()));
+    map.show();
 }
 
 Camera::~Camera()
@@ -33,20 +35,11 @@ Camera::~Camera()
     delete ENCARAFaceDetector;
     delete ui;
 }
-//display map and vedio
-void Camera::on_actionChangeDisplayOrder_triggered()
-{
-    ui->stackedWidget->setCurrentIndex(1);
-    ui->actionChangeDisplayOrder->setEnabled(false);
-    ui->actionDisplayVideo->setEnabled(true);
+
+float Camera::getVariance(float num){
+
 }
 
-void Camera::on_actionDisplayVideo_triggered()
-{
-    ui->stackedWidget->setCurrentIndex(0);
-    ui->actionChangeDisplayOrder->setEnabled(true);
-    ui->actionDisplayVideo->setEnabled(false);
-}
 void Camera::sltTimeOut()
 {
    Mat frame, frameCopy;
@@ -80,30 +73,42 @@ void Camera::sltTimeOut()
            FacialData = ENCARAFaceDetector->GetFacialData();
            faces = FacialData -> Faces;
            if(FacialData ->NumFaces >0){
-               QFile f("/home/tairy/Documents/result/9.txt");
+               // write in a file and draw the figure!
+////////////////////////////////////////////////////////////////////////////////////////
+               QFile f("/home/tairy/Working/MouseTerminator/result/9.txt");
                if(!f.open(QIODevice::WriteOnly | QIODevice::Text|QIODevice::Append))
                {
                    cerr << "Open failed." << endl;
                }
                QTextStream txtOutput(&f);
 
-               txtOutput<<i<<","<<1<<","<<faces[0]->e_lx<<","<<faces[0]->e_ly<<endl;
-               txtOutput<<i<<","<<2<<","<<faces[0]->e_rx<<","<<faces[0]->e_ry<<endl;
-               txtOutput<<i<<","<<3<<","<<faces[0]->np_x<<","<<faces[0]->np_y<<endl;
-               txtOutput<<i<<","<<4<<","<<faces[0]->ml_x<<","<<faces[0]->ml_y<<endl;
+               txtOutput<<i<<","<<1<<","<<faces[0]->e_rx-faces[0]->e_lx<<","<<faces[0]->e_ry-faces[0]->e_ly<<endl;
+               cerr<<i<<","<<1<<","<<faces[0]->e_rx-faces[0]->e_lx<<","<<faces[0]->e_ry-faces[0]->e_ly<<endl;
+//               txtOutput<<i<<","<<2<<","<<faces[0]->e_rx<<","<<faces[0]->e_ry<<endl;
+//               txtOutput<<i<<","<<3<<","<<faces[0]->np_x<<","<<faces[0]->np_y<<endl;
+//               txtOutput<<i<<","<<4<<","<<faces[0]->ml_x<<","<<faces[0]->ml_y<<endl;
                i++;
                f.close();
+///////////////////////////////////////////////////////////////////////////////////
+               //make mouse move
+//               QPoint videoWindowPos = map.getWinPos();
+//               QPoint pos;
+//               int pos_x = (faces[0]->np_x % 10)>5 ? ((faces[0]->np_x/10)*10 + 10 ): ((faces[0]->np_x/10)*10);
+//               int pos_y = (faces[0]->np_y % 10)>5 ? ((faces[0]->np_y/10)*10 + 10 ): ((faces[0]->np_y/10)*10);
+//               pos_x += videoWindowPos.x();
+//               pos_y += videoWindowPos.y();
+//               pos.setX(pos_x);
+//               pos.setY(pos_y);
+//               QCursor::setPos(pos);
+//////////////////////////////////////////////////////////////////////////////////
+
            }
 
            //将抓取到的帧转换成QImage格式
            QImage showImage((const uchar*)m_imgFrame->imageData, m_imgFrame->width, m_imgFrame->height, QImage::Format_RGB888);
 
-//           QImage showImage = m_imgFrame.scaled(ui->stackedWidget->size(),
-//                                           Qt::KeepAspectRatio,
-//                                           Qt::SmoothTransformation);
-
            //将图片显示到QLabel上
-           ui->m_lbPhoto->resize(ui->stackedWidget->size());
+           //ui->m_lbPhoto->resize(ui->stackedWidget->size());
            ui-> m_lbPhoto-> setPixmap(QPixmap::fromImage(showImage));
            if( cvWaitKey(50) == 27 ){
                break;
